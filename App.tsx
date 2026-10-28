@@ -151,8 +151,11 @@ return (
   <Link to="/categories">Categories</Link>
   <Link to="/new-collection">Collections</Link>
   <Link to="/about">About</Link>
+  <Link to="/login">Login</Link>
+  <Link to="/register">Register</Link>
   <Link to="/admin">Admin Dashboard</Link>
 </nav>
+
 
         <button
   className="cart-button"
