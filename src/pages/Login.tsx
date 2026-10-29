@@ -1,14 +1,33 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "../supabase";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    alert(`Demo login submitted for ${email}`);
+    setMessage("");
+    setLoading(true);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+
+    navigate("/");
   };
 
   return (
@@ -35,9 +54,11 @@ export default function Login() {
           required
         />
 
-        <button type="submit" className="checkout-button">
-          Login
+        <button type="submit" className="checkout-button" disabled={loading}>
+          {loading ? "Signing in..." : "Login"}
         </button>
+
+        {message && <p role="alert">{message}</p>}
 
         <p>
           Don't have an account? <Link to="/register">Register</Link>

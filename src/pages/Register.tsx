@@ -1,15 +1,40 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { supabase } from "../supabase";
 
 export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    alert(`Demo registration submitted for ${name}`);
+    setMessage("");
+    setLoading(true);
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: name },
+      },
+    });
+
+    setLoading(false);
+
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+
+    setMessage(
+      data.session
+        ? "Account created successfully! You can now log in."
+        : "Registration submitted! Check your email to confirm your account."
+    );
   };
 
   return (
@@ -45,14 +70,15 @@ export default function Register() {
           required
         />
 
-        <button type="submit" className="checkout-button">
-          Register
+        <button type="submit" className="checkout-button" disabled={loading}>
+          {loading ? "Creating account..." : "Register"}
         </button>
+
+        {message && <p role="status">{message}</p>}
 
         <p>
           Already have an account? <Link to="/login">Login</Link>
         </p>
-
         <Link to="/">← Back to Home</Link>
       </form>
     </main>
